@@ -1,0 +1,102 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+<section>
+    <div id="cart-page" class="">
+        <div class="container">
+            <div class="c-products scroll-hidden">
+            </div>
+            <div class="bill">
+                <span>Họ và tên</span>
+                <input type="text" placeholder="Họ và tên">
+                <span>Địa chỉ:</span>
+                <input type="text" placeholder="Tỉnh/Thành phố">
+                <input type="text" placeholder="Quận/Huyện">
+                <input type="text" placeholder="Phường/Xã">
+                <input type="text" placeholder="Chi tiết">
+                <span>Số điện thoại</span>
+                <input type="text" placeholder="Số điện thoại">
+                <span>
+                    <span>Tổng tiền:</span>
+                    <span class="Total-price">0</span>
+                    <span>VNĐ</span>
+                </span>
+                <button>Hoàn thành</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="product temp" style="display:none;">
+    <div class="info">
+        <div>
+            <a href=""><img src="/resources/img/cafe-product.jpg"></a>
+        </div>
+        <div>
+            <a href="">Lorem, ipsum dolor sit amet consectetur adipisicing elit.</a>
+        </div>
+    </div>
+    <div>
+        <span class="dp"></span>
+        <span class="mg"><span class="price"></span>VNĐ<span></span></span>
+        <input class="mg" type="number">
+        <a class="mg del" hef="#">
+            <i class="far fa-trash-alt"></i> Xóa sản phẩm
+        </a>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        listCartItem.forEach(item => {
+            $.ajax("@Url.Action("GetOne", "Product", new {area = "Home"})/" + item['productId'], {
+                complete: (res) => {
+                    const newProduct = $('.product.temp').clone(true);
+                    newProduct.css('display', 'flex');
+                    var oldValue = 0;
+                    newProduct.removeClass('temp');
+                    newProduct.find('img').attr('src', res.responseJSON.smallImageId);
+                    newProduct.find('.dp').text(res.responseJSON.price);
+                    newProduct.find('.info div:last-child a').text(res.responseJSON.name);
+                    newProduct.find('.price').text(moneyFormat(Number(res.responseJSON.price) * Number(item.quantity)));
+
+                    newProduct.find('a.del').click(function () {
+                        newProduct.remove();
+                        listCartItem.splice(listCartItem.indexOf(item), 1);
+                        localStorage.setItem('cartItems', JSON.stringify(listCartItem));
+                    });
+                    const quantity = newProduct.find('input[type="number"]');
+                    const quan = item.quantity;
+                    quantity.val(quan);
+
+                    quantity.on('focusin', function () {
+                        oldValue = this.value;
+                    });
+
+                    var totalPrice = $('.Total-price');
+                    quantity.on('change', function () {
+                        console.log("change");
+                        if (this.value < 1) {
+                            this.value = 1;
+                        }
+                        var oldPrice = Number(res.responseJSON.price) * oldValue;
+                        var newPrice = Number(res.responseJSON.price) * this.value;
+                        newProduct.find('.price').text(moneyFormat(newPrice));
+                        totalPrice.text(moneyFormat(Number(totalPrice.text().replaceAll('.', '')) + (newPrice - oldPrice)));
+                        oldValue = this.value;
+                        item.quantity = this.value;
+                        localStorage.setItem('cartItems', JSON.stringify(listCartItem));
+                    });
+
+                    totalPrice.text(moneyFormat(Number(totalPrice.text().replaceAll('.', '')) + Number(res.responseJSON.price) * item.quantity));
+
+                    $('#cart-page .c-products').append(newProduct);
+                }
+            });
+        });
+
+    </script>
+}

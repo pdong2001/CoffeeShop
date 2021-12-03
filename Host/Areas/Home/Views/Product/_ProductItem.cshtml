@@ -1,0 +1,27 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{ 
+
+}
+@model Product
+
+<div class="product">
+    <div class="image">
+        <a asp-area="Home" asp-controller="Product" asp-action="ProductDetail" asp-route-id="@Model.Id">
+            <img src="@(Model.SmallImageId.HasValue?"/api/file/" + Model.SmallImageId : "")">
+        </a>
+    </div>
+    <div class="info">
+        <a asp-area="Home" asp-controller="Product" asp-action="ProductDetail" asp-route-id="@Model.Id">@Model.Name</a>
+    </div>
+    <div class="price">
+        <span><span class="dp">@String.Format("{0:n0}", Model.Price)</span>VNĐ</span>
+        <span>Khối lượng tịch: @Html.DisplayFor(m => m.Weight)g</span>
+    </div>
+    <div class="buy">
+        <input type="number">
+        <input type="hidden" id="_productId" value="@Model.Id"/>
+        <a class="add-to-cart">Thêm vào giỏ hàng</a>
+    </div>
+</div>

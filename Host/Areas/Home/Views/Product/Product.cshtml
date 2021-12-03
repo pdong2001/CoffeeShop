@@ -1,0 +1,46 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@model Product[]
+
+<section>
+    <div id="product-page" class="">
+        <div class="title">
+            <h1>SẢN PHẨM</h1>
+            <img src="/resources/img/Coffee-nine.gif">
+        </div>
+        <div class="products">
+            @foreach (var item in Model)
+            {
+                <partial name="_ProductItem" model="item" />
+            }
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        $('.add-to-cart').click(function () {
+            var product = $(this).parent().parent();
+            var quantity = product.find('input[type="number"]').val();
+            var productId = product.find('#_productId').val();
+            var notExist = true;
+            listCartItem.forEach(item => {
+                if (item.productId == productId) {
+                    item.quantity = Number(item.quantity) + Number(quantity);
+                    notExist = false;
+                }
+            });
+            if (notExist) {
+                listCartItem.push({
+                    'quantity': quantity,
+                    'productId': productId
+                });
+            }
+            localStorage.setItem('cartItems', JSON.stringify(listCartItem));
+            refeshCartCount();
+        });
+    </script>
+}
